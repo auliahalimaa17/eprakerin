@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelengkapan Berkas - E-Prakerin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .header-image {
+            background: url('{{ url_for('static', filename='images/header.png') }}') center center / cover no-repeat;
+            background-size: 100%;
+            height: 200px;
+            max-width: 100%;
+            opacity: 0.8;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.811));
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .timeline li {
+            position: relative;
+            text-align: center;
+            flex: 1;
+        }
+
+        .timeline li::before {
+            content: attr(data-step);
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background-color: #EEEEEE;
+            border: 2px solid #007bff;
+            display: block;
+            margin: 0 auto 10px;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .timeline li.active::before {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .timeline li::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background-color: #EEEEEE;
+            top: 15px;
+            left: -50%;
+            z-index: -1;
+        }
+
+        .timeline li:first-child::after {
+            display: none;
+        }
+
+        .timeline li.active::after {
+            background-color: #007bff;
+        }
+        .timeline li.timeline-revisi::before {
+            background-color: red;
+            color: white;
+            border-color: red;
+        }
+
+        .timeline li.timeline-revisi::after {
+            background-color: red;
+        }
+
+        .form-section {
+            margin-top: 30px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+        }
+
+        .file-upload {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .file-upload.drag-over {
+            border-color: #0056b3;
+            background-color: #f0f8ff;
+        }
+
+        .btn-upload {
+            width: 100%;
+            border-radius: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-upload:hover {
+            background-color: #0056b3;
+        }
+
+        .instructions {
+            color: red;
+            font-weight: bold;
+            margin-top: 30px;
+            line-height: 1.5;
+        }
+
+        .copyright {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <!-- Header Image -->
+    <div class="header-image">
+        <div class="header-overlay"></div>
+    </div>
+    <div class="container">
+
+        <!-- Timeline -->
+        <ul class="timeline">
+            <li class="active" data-step="1">Administrasi</li>
+            <li class="active" data-step="2">Proses Seleksi</li>
+            <li class="active {% if peserta.StatusPendaftaran.status_berkas == 'Revisi' %}timeline-revisi{% endif %}" data-step="3">Kelengkapan Berkas</li>
+            <li data-step="4">Wawancara</li>
+            <li data-step="5">Pengumuman</li>
+        </ul>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <h4>Kelengkapan Berkas</h4>
+
+            <!-- Section Catatan: Ditampilkan jika status berkas adalah Revisi -->
+            {% if peserta.StatusPendaftaran.status_berkas == 'Revisi' and peserta.StatusPendaftaran.catatan %}
+            <div class="mb-4">
+                <label class="form-label"><strong>Catatan Revisi</strong></label>
+                <div class="alert alert-light" style="border: 1px solid red; padding: 15px;">
+                    <p style="color: red; font-weight: bold;">{{ peserta.StatusPendaftaran.catatan }}</p>
+                </div>
+            </div>
+        {% endif %}
+         <!-- Download File Section -->
+         <div class="mb-4">
+            <p>Surat Pembuatan Tanda Pengenal</p>
+            {% if peserta.BerkasPeserta.surat_pembuatan_idcard %}
+                <a href="{{ url_for('static', filename=peserta.BerkasPeserta.surat_pembuatan_idcard.replace('\\', '/')) }}" class="btn btn-success btn-sm" target="_blank">Download File</a>
+            {% else %}
+                <span class="text-danger">Berkas belum tersedia.</span>
+            {% endif %}
+        </div>
+        <div class="mb-4">
+            <p>Surat Penerimaan Prakerin</p>
+            {% if peserta.BerkasPeserta.surat_penerimaan %}
+                <a href="{{ url_for('static', filename=peserta.BerkasPeserta.surat_penerimaan.replace('\\', '/')) }}" class="btn btn-success btn-sm" target="_blank">Download File</a>
+            {% else %}
+                <span class="text-danger">Berkas belum tersedia.</span>
+            {% endif %}
+        </div>
+        <!-- Upload Fields -->
+        <form method="POST" action="{{ url_for('kelengkapanberkas', id=peserta.DataPeserta.id) }}" enctype="multipart/form-data">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="mentorName" class="form-label">Nama Pembimbing di Kampus/Sekolah</label>
+                    <input type="text" class="form-control" id="mentorName" name="nama_pembimbing" placeholder="Masukkan Nama Pembimbing" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="mentorPhone" class="form-label">No. Handphone Pembimbing di Kampus/Sekolah</label>
+                    <input type="tel" class="form-control" id="mentorPhone" name="nohp_pembimbing" placeholder="Masukkan Nomor Handphone Pembimbing" required>
+                </div>
+            </div>
+
+            <!-- Upload File Fields -->
+            <div class="mb-4">
+                <label class="form-label">Upload File Pas Foto (berwarna, latar merah, menggunakan jas almameter)</label>
+                <input type="file" class="form-control" name="pas_foto" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File Surat Keterangan Sehat dari Rumah Sakit/Klinik</label>
+                <input type="file" class="form-control" name="surat_sehat" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File Kartu Tanda Mahasiswa/Siswa</label>
+                <input type="file" class="form-control" name="kartu_tanda_mahasiswa" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File KTP</label>
+                <input type="file" class="form-control" name="ktp" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File Kartu Keluarga</label>
+                <input type="file" class="form-control" name="kartu_keluarga" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File SIM (bagi yang memiliki kendaraan)</label>
+                <input type="file" class="form-control" name="sim" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File STNK (bagi yang memiliki kendaraan)</label>
+                <input type="file" class="form-control" name="stnk" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Upload File SKCK dari Kepolisian</label>
+                <input type="file" class="form-control" name="skck" accept=".pdf,.png,.jpg,.jpeg" required>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <p>Silahkan membawa hard file dari berkas berikut:</p>
+                <ol>
+                    <li>Satu buah Map berwarna merah untuk mahasiswa / berwarna kuning untuk siswa</li>
+                    <li>Satu lembar Surat Pembuatan Tanda Pengenal</li>
+                    <li>Satu lembar Surat Penerimaan Prakerin</li>
+                    <li>Satu lembar Fotokopi Kartu Tanda Mahasiswa/Siswa</li>
+                    <li>Satu lembar Fotokopi KTP dan Kartu Keluarga</li>
+                    <li>Satu lembar Fotokopi SIM dan STNK (bagi yang memiliki kendaraan)</li>
+                    <li>Satu lembar Surat Keterangan Sehat</li>
+                    <li>Satu lembar SKCK</li>
+                    <li>Tiga lembar Pas Foto berukuran 2x3 (latar merah dengan memakai jas almamater)</li>
+                    <li>Satu lembar Pas Foto berukuran 3x4 (latar merah dengan memakai jas almamater)</li>
+                    <li>Satu lembar Surat Pengantar Magang dari Kampus/Sekolah</li>
+                </ol>
+                <p>Harap membawa berkas di atas H-7 hari sebelum tanggal magang dimulai untuk diserahkan kepada Departemen Human Capital.</p>
+            </div>
+
+            <!-- Upload Button -->
+            <button type="submit" class="btn-upload">Upload</button>
+        </div>
+    </div>
+
+    <div class="copyright">
+        Copyright © 2025 Pindad. All rights reserved.
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Drag-and-drop file upload dengan opsi simpan, edit, delete
+        document.querySelectorAll('.file-upload').forEach((uploadField, index) => {
+            const fileOptions = document.getElementById(`fileOptions${index + 1}`);
+            
+            uploadField.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadField.classList.add('drag-over');
+            });
+
+            uploadField.addEventListener('dragleave', () => {
+                uploadField.classList.remove('drag-over');
+            });
+
+            uploadField.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadField.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                handleFileUpload(files, uploadField, fileOptions);
+            });
+
+            uploadField.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.pdf,.png,.jpg,.jpeg';
+                input.onchange = (e) => {
+                    handleFileUpload(e.target.files, uploadField, fileOptions);
+                };
+                input.click();
+            });
+        });
+
+        function handleFileUpload(files, uploadField, fileOptions) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.size <= 2 * 1024 * 1024) {
+                    uploadField.textContent = file.name;
+                    fileOptions.style.display = 'block';
+                } else {
+                    alert('File terlalu besar. Maksimum 2 MB.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

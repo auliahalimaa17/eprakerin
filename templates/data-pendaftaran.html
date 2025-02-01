@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pendaftaran - E-Prakerin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .header-image {
+            background: url('{{ url_for('static', filename='images/header.png') }}') center center / cover no-repeat;
+            background-size: 100%;
+            height: 200px;
+            max-width: 100%;
+            opacity: 0.8;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .status-tag {
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .status-perlu-diseleksi { background-color: #fd7e14; }
+        .status-kel-berkas { background-color: #5154EB; }
+        .status-wawancara { background-color: #6f42c1; }
+        .status-diterima { background-color: #28a745; }
+        .status-ditolak { background-color: #dc3545; }
+
+        .status-berkas-sedang { background-color: #ffc107; color: black; }
+        .status-berkas-revisi { background-color: #ff3700; }
+        .status-berkas-sesuai { background-color: #28a745; }
+        .status-berkas-tidak { background-color: #dc3545; }
+        .status-berkas-menunggu { background-color: #17a2b8; }
+
+        .table thead th {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .pagination-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar-admin.html' %}
+
+    <!-- Header Image -->
+    <div class="container-fluid">
+        <div class="header-image"></div>
+    </div>
+
+    <!-- Data Pendaftaran Section -->
+    <div class="container">
+        <h4>Data Pendaftaran</h4>
+        <div class="filter-section">
+            <div>
+                Show
+                <select class="form-select d-inline-block" style="width: auto;">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                entries
+            </div>
+            <div>
+                Filter Data:
+                <input type="text" class="form-control d-inline-block" style="width: 200px;" placeholder="Cari...">
+            </div>
+        </div>
+
+        <!-- Tabel Data Peserta Aktif -->
+        <h5>Data Peserta Aktif</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Asal Kampus/Sekolah</th>
+                    <th>Status</th>
+                    <th>Status Berkas</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="data-body">
+                {% for row in data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.nama }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>{{ row.asal_kampus }}</td>
+                    <td>
+                        <span class="status-tag 
+                            {% if row.status_daftar == 'Perlu Diseleksi' %} status-perlu-diseleksi 
+                            {% elif row.status_daftar == 'Kel. Berkas' %} status-kel-berkas 
+                            {% elif row.status_daftar == 'Wawancara' %} status-wawancara 
+                            {% elif row.status_daftar == 'Diterima' %} status-diterima 
+                            {% elif row.status_daftar == 'Ditolak' %} status-ditolak 
+                            {% endif %}">
+                            {{ row.status_daftar }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-tag 
+                            {% if row.status_berkas == 'Sedang Diproses' %} status-berkas-sedang 
+                            {% elif row.status_berkas == 'Revisi' %} status-berkas-revisi 
+                            {% elif row.status_berkas == 'Sesuai' %} status-berkas-sesuai 
+                            {% elif row.status_berkas == 'Tidak Sesuai' %} status-berkas-tidak
+                            {% elif row.status_berkas == 'Menunggu Peserta' %} status-berkas-menunggu  
+                            {% endif %}">
+                            {{ row.status_berkas }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if row.status_daftar == 'Perlu Diseleksi' %}
+                        <a href="/detaildatapeserta/{{ row.id }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        {% elif row.status_daftar == 'Kel. Berkas' and row.status_berkas in ['Sedang Diproses', 'Revisi'] %}
+                        <a href="/detaildatapesertakelberkas/{{ row.id }}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        {% else %}
+                        <a href="#" class="btn btn-warning btn-sm disabled">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination Section -->
+        <div class="pagination-section">
+            <p>Showing 1 to 3 of 3 entries</p>
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#">Sebelumnya</a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Selanjutnya</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Tabel Data Peserta Diterima dan Ditolak -->
+        <h5 class="mt-5">Data Peserta Diterima dan Ditolak</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Asal Kampus/Sekolah</th>
+                    <th>Status</th>
+                    <th>Status Berkas</th>
+                </tr>
+            </thead>
+            <tbody id="data-body">
+                {% for row in data if row.status_daftar in ['Diterima', 'Ditolak'] %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.nama }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>{{ row.asal_kampus }}</td>
+                    <td>
+                        <span class="status-tag 
+                            {% if row.status_daftar == 'Diterima' %} status-diterima 
+                            {% elif row.status_daftar == 'Ditolak' %} status-ditolak 
+                            {% endif %}">
+                            {{ row.status_daftar }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-tag 
+                            {% if row.status_berkas == 'Sedang Diproses' %} status-berkas-sedang 
+                            {% elif row.status_berkas == 'Revisi' %} status-berkas-revisi 
+                            {% elif row.status_berkas == 'Sesuai' %} status-berkas-sesuai 
+                            {% elif row.status_berkas == 'Menunggu Peserta' %} status-berkas-menunggu  
+                            {% endif %}">
+                            {{ row.status_berkas }}
+                        </span>
+                    </td>
+                {% endfor %}
+        </table>
+    </div>
+
+    <div class="copyright">
+        Copyright © 2025 Pindad. All rights reserved.
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fungsi untuk melakukan filter data berdasarkan input pencarian
+        const searchInput = document.querySelector('input[placeholder="Cari..."]');
+        const tableRows = document.querySelectorAll('#data-body tr');
+    
+        searchInput.addEventListener('input', function () {
+            const filter = searchInput.value.toLowerCase();
+            tableRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let match = false;
+    
+                cells.forEach(cell => {
+                    if (cell.innerText.toLowerCase().includes(filter)) {
+                        match = true;
+                    }
+                });
+    
+                row.style.display = match ? '' : 'none';
+            });
+        });
+    </script>    
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Peserta Prakerin - E-Prakerin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .header-image {
+            background: url('{{ url_for('static', filename='images/header.png') }}') center center / cover no-repeat;
+            background-size: 100%;
+            height: 200px;
+            max-width: 100%;
+            opacity: 0.8;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .table-section {
+            margin-top: 20px;
+        }
+
+        .btn-view {
+            border-radius: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: white;
+            background-color: #ffc107;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-view:hover {
+            background-color: #e0a800;
+        }
+
+        .pagination {
+            justify-content: end;
+        }
+
+        .copyright {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar-admin.html' %}
+
+    <!-- Header Image -->
+    <div class="container-fluid">
+        <div class="header-image"></div>
+    </div>
+
+    <!-- Data Peserta Prakerin -->
+    <div class="container table-section">
+        <h4 class="title">Data Peserta Prakerin</h4>
+        <div class="table-responsive">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <label for="entries" class="form-label me-2">Show</label>
+                    <select id="entries" class="form-select d-inline-block" style="width: auto;">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span class="ms-2">entries</span>
+                </div>
+                <div>
+                    <label for="filter" class="form-label me-2">Filter Data:</label>
+                    <input type="text" id="filter" class="form-control d-inline-block" style="width: auto;">
+                </div>
+            </div>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>No.</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Asal Kampus/Sekolah</th>
+                        <th>Tanggal Masuk</th>
+                        <th>Tanggal Selesai</th>
+                        <th>Nama Divisi</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if data_peserta %}
+                        {% for peserta in data_peserta %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ peserta.nama }}</td>
+                            <td>{{ peserta.email }}</td>
+                            <td>{{ peserta.asal_kampus }}</td>
+                            <td>{{ peserta.tanggal_dimulai.strftime('%d/%m/%Y') if peserta.tanggal_dimulai else '-' }}</td>
+                            <td>{{ peserta.tanggal_berakhir.strftime('%d/%m/%Y') if peserta.tanggal_berakhir else '-' }}</td>                            
+                            <td>{{ peserta.nama_divisi }}</td>
+                            <td>
+                                <a href="{{ url_for('detailpesertaprakerin', id=peserta.id) }}" class="btn-view">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">Tidak ada data peserta prakerin yang diterima.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>                
+                
+            </table>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>Showing 1 to 10 of 30 entries</div>
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item"><a class="page-link" href="#">Sebelumnya</a></li>
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">1</span>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Selanjutnya</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <!-- Form Generate Report -->
+        <div class="container mt-4 mb-4">
+            <h5 class="title">Generate Laporan</h5>
+            <p><i>Apabila filter data tidak diisi, akan secara otomatis mengambil semua data Peserta Prakerin.</i></p><br>
+            <form method="POST" action="{{ url_for('generate_report') }}">
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="tanggal_mulai" class="form-label">Tanggal Mulai</label>
+                        <input type="date" id="tanggal_mulai" name="tanggal_mulai" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="tanggal_selesai" class="form-label">Tanggal Selesai</label>
+                        <input type="date" id="tanggal_selesai" name="tanggal_selesai" class="form-control">
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="asal_kampus" class="form-label">Asal Kampus/Sekolah</label>
+                        <input type="text" id="asal_kampus" name="asal_kampus" class="form-control" placeholder="Masukkan nama kampus/sekolah">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nama_divisi" class="form-label">Divisi Penempatan</label>
+                        <input type="text" id="nama_divisi" name="nama_divisi" class="form-control" placeholder="Masukkan nama divisi">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Generate Laporan</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="copyright">
+        Copyright © 2025 Pindad. All rights reserved.
+    </div>
+
+    <script>
+        document.getElementById('filter').addEventListener('input', function () {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

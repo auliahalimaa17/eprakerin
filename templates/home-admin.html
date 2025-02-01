@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Admin - E-Prakerin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .header-image {
+            background: url('{{ url_for('static', filename='images/header.png') }}') center center / cover no-repeat;
+            background-size: 100%;
+            height: 200px;
+            max-width: 100%;
+            opacity: 0.8;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.811));
+        }
+
+        .overview-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .overview-section h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .overview-section p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .overview-box {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .overview-card {
+            width: 150px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .card-blue {
+            background-color: #007bff;
+        }
+
+        .card-green {
+            background-color: #28a745;
+        }
+
+        .card-red {
+            background-color: #dc3545;
+        }
+
+        .status-section {
+            margin-top: 50px;
+        }
+
+        .status-box {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .status-card {
+            width: 150px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .card-orange {
+            background-color: #fd7e14;
+        }
+
+        .card-purple {
+            background-color: #6f42c1;
+        }
+
+        .card-green {
+            background-color: #28a745;
+        }
+
+        .copyright {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        .overview-card, .status-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .overview-card:hover, .status-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Tambahkan animasi saat halaman dimuat */
+        .overview-card, .status-card {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .overview-card.animate, .status-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }        
+    </style>
+</head>
+<body>
+    {% include 'navbar-admin.html' %}
+
+    <!-- Header Image -->
+    <div>
+        <div class="header-image">
+            <div class="header-overlay"></div>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="overview-section">
+            <h1>Selamat Datang, admin!</h1>
+            <p>Kelola data peserta Prakerin pada halaman <b>Data Pendaftaran</b>.</p>
+        </div>
+
+        <!-- Overview Box -->
+        <div class="overview-box">
+            <div class="overview-card card-blue">Data Pendaftar<br><span style="font-size: 24px;">{{ total_pendaftar }}</span></div>
+            <div class="overview-card card-green">Data Diterima<br><span style="font-size: 24px;">{{ total_diterima }}</span></div>
+            <div class="overview-card card-red">Data Ditolak<br><span style="font-size: 24px;">{{ total_ditolak }}</span></div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="status-section">
+            <h5 class="text-center">Data Pelamar Berdasarkan Status</h5>
+            <div class="status-box">
+                <div class="status-card card-orange">Proses Seleksi<br><span style="font-size: 24px;">{{ proses_seleksi }}</span></div>
+                <div class="status-card card-purple">Kelengkapan Berkas<br><span style="font-size: 24px;">{{ kelengkapan_berkas }}</span></div>
+                <div class="status-card card-green">Wawancara<br><span style="font-size: 24px;">{{ wawancara }}</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="copyright">
+        Copyright © 2025 Pindad. All rights reserved.
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tambahkan class 'animate' ke semua card setelah halaman dimuat
+            const cards = document.querySelectorAll('.overview-card, .status-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate');
+                }, index * 100); // Menambahkan delay untuk efek bertahap
+            });
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

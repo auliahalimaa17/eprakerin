@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Peserta Wawancara - E-Prakerin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .header-image {
+            background: url('{{ url_for('static', filename='images/header.png') }}') center center / cover no-repeat;
+            background-size: 100%;
+            height: 200px;
+            max-width: 100%;
+            opacity: 0.8;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .table-section {
+            margin-top: 20px;
+        }
+        .table-striped th{
+            vertical-align: middle;
+            text-align: center;
+            background-color: #dddddd;
+            color: rgb(0, 0, 0);
+        }
+        .table-striped td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table-striped input[type="date"],
+        .table-striped input[type="checkbox"] {
+            margin: auto;
+            display: block;
+            width: 90%;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .table-striped input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #007bff;
+            border: 2px solid #007bff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .table-striped input[type="checkbox"]:hover {
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.6);
+        }
+
+        .table-striped input[type="checkbox"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+        }
+        .copyright {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .btn-success, .btn-danger {
+            width: 100px;
+        }
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .btn-set-date {
+            background-color: #FFA500;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+
+    </style>
+</head>
+<body>
+    {% include 'navbar-admin.html' %}
+
+    <!-- Header Image -->
+    <div class="container-fluid">
+        <div class="header-image"></div>
+    </div>
+
+    <div class="container">
+        <!-- Form Data Peserta Wawancara -->
+        <h4>Data Peserta Wawancara</h4>
+        <form method="POST">
+            <div class="table-section">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Asal Kampus/Sekolah</th>
+                            <th>Tanggal Wawancara</th>
+                            <th>Selesai Wawancara?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for peserta in peserta_wawancara %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ peserta.nama }}</td>
+                            <td>{{ peserta.email }}</td>
+                            <td>{{ peserta.asal_kampus }}</td>
+                            <td>
+                                <!-- <input type="datetime-local" class="form-control" name="tanggal_wawancara" value="{{ peserta.tanggal_wawancara or '' }}" required> -->
+                                <input type="datetime-local" class="form-control" name="tanggal_wawancara" 
+                                value="{{ peserta.tanggal_wawancara.strftime('%Y-%m-%dT%H:%M') if peserta.tanggal_wawancara else '' }}" required>                         
+                                <input type="hidden" name="peserta_ids" value="{{ peserta.id }}">
+                            </td>
+                            <td>
+                                <input type="checkbox" name="selesai_wawancara" value="{{ peserta.id }}">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn-submit">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="copyright">
+        Copyright © 2025 Pindad. All rights reserved.
+    </div>
+
+
+    <script>
+        // Fungsi Pencarian
+        document.querySelector('input[placeholder="Cari..."]').addEventListener('input', function () {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#table-wawancara tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    
+        // Fungsi Pagination
+        // Anda bisa menggunakan plugin seperti DataTables atau menambahkan pagination manual
+    </script>    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
